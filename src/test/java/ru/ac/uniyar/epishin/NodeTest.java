@@ -2,6 +2,8 @@ package ru.ac.uniyar.epishin;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NodeTest {
@@ -130,4 +132,49 @@ public class NodeTest {
         assertEquals("NewRoot",root.getName());
     }
 
+    /*
+    root
+        a
+            c
+            d
+        b
+            e
+     */
+    @Test
+    void iterateTest(){
+        Node root = new Node("Root");
+        Node a = new Node("a");
+        Node b = new Node("b");
+        Node c = new Node("c");
+        Node d = new Node("d");
+        Node e = new Node("e");
+        root.addChild(a);
+        root.addChild(b);
+        a.addChild(c);
+        a.addChild(d);
+        b.addChild(e);
+
+        AtomicInteger count = new AtomicInteger(0);
+        root.iterateTree((level, node)->{
+            if (node.getName().equals("c")) {
+                assertEquals(2,level);
+            }
+            count.incrementAndGet();
+
+            for(int i = 0 ;i!= level;i++)
+                System.out.print("   ");
+            System.out.println(node.getName());
+        });
+        assertEquals(6,count.get());
+
+       AtomicInteger staticCount = new AtomicInteger(0);
+       Node.iterateStaticTree((level, node)->{
+           if (node.getName().equals("c")) {
+               assertEquals(2,level);
+           }
+           staticCount.incrementAndGet();
+       },root,0);
+        assertEquals(6,staticCount.get());
+
+    }
 }

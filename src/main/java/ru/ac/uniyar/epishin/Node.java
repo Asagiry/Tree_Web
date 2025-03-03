@@ -1,5 +1,6 @@
 package ru.ac.uniyar.epishin;
 
+import javax.swing.tree.TreeCellRenderer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -74,6 +75,33 @@ public class Node {
 
     public void editName(String name) {
         _name = name;
+    }
+
+    public void iterateTree(TreeIteratorHandler handler){ // Можно сделать через static но я не уверен как лучше
+        handler.handleNode(0,this);
+
+        List<Node> children = this.getChildren();
+        for(int i =0;i!=children.size();i++){
+            iterateTree(handler,children.get(i),1);
+        }
+    }
+
+    private void iterateTree(TreeIteratorHandler handler, Node node, int level) {
+        handler.handleNode(level,node);
+
+        List<Node> children = node.getChildren();
+        for(int i =0;i!=children.size();i++){
+            iterateTree(handler,children.get(i),level+1);
+        }
+    }
+
+    public static void iterateStaticTree(TreeIteratorHandler handler, Node node,int level){
+        handler.handleNode(level, node);
+
+        List<Node> children = node.getChildren();
+        for (int i = 0;i!=children.size();i++){
+            Node.iterateStaticTree(handler,children.get(i),level+1);
+        }
     }
 
 
