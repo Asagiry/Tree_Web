@@ -1,133 +1,80 @@
 package ru.ac.uniyar.epishin;
 
-import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class Node {
+    private String _name;
+    private final UUID _id;
+    private final List<Node> _children;
 
-public class NodeTest {
-
-    /*Реализовать структуру данных хранящую в себе дерево
-- Использовать ООП
-- Каждый узел хранит строку и идентификатор
-- Реализовать операции
-- создание дерева
-- добавление узла в дерево
-- удаление дочернего узла по его имени или идентификатору
-- удаление всех дочерних узлов
-- поиск дочернего узла по имени
-- изменение значения узла
-- Main функция не нужна. Это будет библиотека
-     */
-
-
-    @Test
-    void createTree(){
-        Node root = new Node("Root");
-        assertNotNull(root);
-        assertEquals("Root",root.getName());
+    public Node(String name) {
+        _name = name;
+        _id = UUID.randomUUID();
+        _children = new ArrayList<Node>();
     }
 
-    @Test
-    void addNode(){
-        Node root = new Node("Root");
-        Node child = new Node("Child");
-        root.addChild(child);
-        assertEquals(child.getId(),root.getChildren().get(0).getId());
+    public String getName() {
+        return _name;
     }
 
-    @Test
-    void addNodeThatAlreadyChild(){
-        Node root = new Node("Root");
-        Node child = new Node("Child");
-        root.addChild(child);
-
-        root.addChild(child);
-        assertEquals(1,root.getChildren().size());
+    public UUID getId() {
+        return _id;
     }
 
-    @Test
-    void addNodeToChild(){
-        Node father = new Node("Father");
-        Node child = new Node("Child");
-        father.addChild(child);
-
-        assertThrows(Exception.class, () -> {
-            child.addChild(father);
-        });
+    public List<Node> getChildren() {
+        return _children;
     }
 
-    @Test
-    void removeChildByName() {
-        Node root = new Node("Root");
-        Node child = new Node("Child");
-        Node remove = new Node("Remove");
-        root.addChild(child);
-        root.addChild(remove);
+    public void addChild(Node child)  {
 
-        root.removeChildByName("Remove");
+        if (child.getChildren().contains(this))
+            throw new IllegalArgumentException("Given node is already father for this node");
 
-        assertEquals(1,root.getChildren().size());
-        assertEquals(child.getName(),root.getChildren().get(0).getName());
+
+        if (!_children.contains(child)){
+            _children.add(child);
+        }
     }
 
-    @Test
-    void removeChildById(){
-        Node root = new Node("Root");
-        Node child = new Node("Child");
-        Node remove = new Node("Remove");
-        root.addChild(child);
-        root.addChild(remove);
-
-        root.removeChildById(remove.getId());
-
-        assertEquals(1,root.getChildren().size());
-        assertEquals(child.getId(),root.getChildren().get(0).getId());
+    public void removeChildren() {
+        _children.clear();
     }
 
-    @Test
-    void removeAllChildren(){
-        Node root = new Node("Root");
-        Node firstChild = new Node("FirstChild");
-        Node secondChild = new Node("SecondChild");
-        root.addChild(firstChild);
-        root.addChild(secondChild);
-
-        root.removeChildren();
-
-        assertEquals(0,root.getChildren().size());
+    public void removeChildByName(String name) {
+        for (int i = 0;i!= _children.size();i++){
+            if (_children.get(i).getName().equals(name))
+            {
+                _children.remove(i);
+                break;
+            }
+        }
     }
 
-    @Test
-    void findChild(){
-        Node root = new Node("Root");
-        Node firstChildren = new Node("FirstChildren");
-        Node secondChildren = new Node("SecondChildren");
-        root.addChild(firstChildren);
-        root.addChild(secondChildren);
-
-        Node found = root.findChild(firstChildren.getName());
-        assertEquals(firstChildren.getId(),found.getId());
-
-        found = root.findChild(secondChildren.getName());
-        assertEquals(secondChildren.getId(),found.getId());
-
+    public void removeChildById(UUID id) {
+        for (int i = 0;i!= _children.size();i++){
+            if (_children.get(i).getId().toString().equals(id.toString()))
+            {
+                _children.remove(i);
+                break;
+            }
+        }
     }
 
-    @Test
-    void findNotExistChild(){
-        Node root = new Node("Root");
-
-        Node notFount = root.findChild("Child");
-
-        assertNull(notFount);
+    public Node findChild(String name) {
+        for (int i = 0;i!= _children.size();i++){
+            if (_children.get(i).getName().equals(name))
+            {
+                return _children.get(i);
+            }
+        }
+        return null;
     }
 
-    @Test
-    void editName(){
-        Node root = new Node("Root");
-        root.editName("NewRoot");
-
-        assertEquals("NewRoot",root.getName());
+    public void editName(String name) {
+        _name = name;
     }
+
 
 }
