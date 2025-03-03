@@ -19,6 +19,7 @@ public class NodeTest {
 - Main функция не нужна. Это будет библиотека
      */
 
+
     @Test
     void createTree(){
         Node root = new Node("Root");
@@ -34,9 +35,18 @@ public class NodeTest {
         assertEquals(child.getId(),root.getChildren().get(0).getId());
     }
 
-
     @Test
     void addNodeThatAlreadyChild(){
+        Node root = new Node("Root");
+        Node child = new Node("Child");
+        root.addChild(child);
+
+        root.addChild(child);
+        assertEquals(1,root.getChildren().size());
+    }
+
+    @Test
+    void addNodeToChild(){
         Node father = new Node("Father");
         Node child = new Node("Child");
         father.addChild(child);
