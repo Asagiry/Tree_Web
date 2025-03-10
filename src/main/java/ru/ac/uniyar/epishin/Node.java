@@ -106,28 +106,13 @@ public class Node {
     }
 
     public String getHtmlTree(){
-        final StringBuilder output = new StringBuilder();
-        output.append(generateStartHtml());
-
-        iterateTree((level, node)->{
-            output.append("＿＿＿＿".repeat(Math.max(0, level)));
-            output.append(node.getName());
-            output.append("<br>");
-        });
-
-        output.append(generateEndHtml());
-
-        return output.toString();
-    }
-
-    private String generateStartHtml() {
+        String stringTree = getStringTree();
         return "<HTML>\n" +
                 "<HEAD>\n" +
-                "<BODY>\n";
-    }
-    private String generateEndHtml() {
-        return "</BODY>\n" +
-                "</HEAD>\n" +
+                "<BODY>\n" +
+                stringTree.replace("\n","<br>")+
+                "</BODY>\n"+
+                "</HEAD>\n"+
                 "</HTML>";
     }
 
