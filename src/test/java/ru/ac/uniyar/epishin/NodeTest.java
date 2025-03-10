@@ -231,12 +231,17 @@ public class NodeTest {
         b.addChild(e);
 
         String fileName = "testHtml";
+        
         root.writeHtmlFileTree(fileName);
+
+        Boolean isFileCreated = Files.exists(Path.of(fileName+".html"));
+        assertEquals(true,isFileCreated);
 
         String actual = Files.readString(Path.of(fileName+".html"));
         assertEquals(root.getHtmlTree(),actual);
 
         Files.delete(Path.of(fileName+".html"));
+
     }
 
 }
