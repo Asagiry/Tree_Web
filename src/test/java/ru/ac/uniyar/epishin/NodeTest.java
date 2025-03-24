@@ -1,7 +1,11 @@
 package ru.ac.uniyar.epishin;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,6 +35,7 @@ public class NodeTest {
         Node root = new Node("Root");
         assertNotNull(root);
         assertEquals("Root",root.getName());
+
     }
 
     @Test
@@ -136,14 +141,6 @@ public class NodeTest {
         assertEquals("NewRoot",root.getName());
     }
 
-    /*
-    root
-        a
-            c
-            d
-        b
-            e
-     */
     @Test
     void iterateTest(){
         Node root = new Node("Root");
@@ -241,6 +238,83 @@ public class NodeTest {
         assertEquals(root.getHtmlTree(),actual);
 
         Files.delete(Path.of(fileName+".html"));
+
+    }
+
+    @Test
+    void getJsonTreeTest() throws JsonProcessingException {
+        Node root = new Node("Root");
+        Node a = new Node("a");
+        Node b = new Node("b");
+        Node c = new Node("c");
+        Node d = new Node("d");
+        Node e = new Node("e");
+        root.addChild(a);
+        root.addChild(b);
+        a.addChild(c);
+        a.addChild(d);
+        b.addChild(e);
+
+        String fileName = "testHtml";
+
+        String actual = root.getJsonTree();
+
+        String expected = new ObjectMapper().
+                writerWithDefaultPrettyPrinter().
+                writeValueAsString(root);
+
+        assertEquals(expected,actual);
+
+    }
+
+    @Test
+    void writeJsonToFileTest() throws IOException {
+        Node root = new Node("Root");
+        Node a = new Node("a");
+        Node b = new Node("b");
+        Node c = new Node("c");
+        Node d = new Node("d");
+        Node e = new Node("e");
+        root.addChild(a);
+        root.addChild(b);
+        a.addChild(c);
+        a.addChild(d);
+        b.addChild(e);
+
+        String fileName = "testJson";
+
+        root.writeJsonFileTree(fileName);
+
+        Boolean isFileCreated = Files.exists(Path.of(fileName+".json"));
+        assertEquals(true,isFileCreated);
+
+        String actual = Files.readString(Path.of(fileName+".json"));
+        assertEquals(root.getJsonTree(),actual);
+
+        Files.delete(Path.of(fileName+".json"));
+
+    }
+
+    @Test
+    void readJsonFileTest(){
+        Node root = new Node("Root");
+        Node a = new Node("a");
+        Node b = new Node("b");
+        Node c = new Node("c");
+        Node d = new Node("d");
+        Node e = new Node("e");
+        root.addChild(a);
+        root.addChild(b);
+        a.addChild(c);
+        a.addChild(d);
+        b.addChild(e);
+
+        String fileName = "testJson";
+        root.writeJsonFileTree(fileName);
+
+        Node equalsRoot = Node.readJsonFileTree(fileName);
+
+        assertEquals(root,equalsRoot);
 
     }
 

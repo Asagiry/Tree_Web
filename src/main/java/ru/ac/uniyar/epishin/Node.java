@@ -1,4 +1,7 @@
 package ru.ac.uniyar.epishin;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -11,11 +14,23 @@ import java.util.UUID;
 
 public class Node {
     private String _name;
-    private final UUID _id;
-    private final List<Node> _children;
+    private UUID _id;
+    private List<Node> _children;
 
     public Node(String name) {
         _name = name;
+        _id = UUID.randomUUID();
+        _children = new ArrayList<Node>();
+    }
+
+    public Node(String name, UUID id, List<Node> children){
+        _name = name;
+        _id = id;
+        _children = children;
+    }
+
+    public Node(){
+        _name = "NewNode";
         _id = UUID.randomUUID();
         _children = new ArrayList<Node>();
     }
@@ -31,6 +46,21 @@ public class Node {
     public List<Node> getChildren() {
         return _children;
     }
+
+    public void setName(String name){
+        _name = name;
+    }
+
+    public void setId(UUID id){
+        _id = id;
+    }
+
+    public void setChildren(List<Node> children)
+    {
+        _children = children;
+    }
+
+
 
     public void addChild(Node child)  {
 
@@ -93,10 +123,9 @@ public class Node {
             Node._iterateStaticTree(handler,children.get(i),level+1);
         }
     }
-
+    @JsonIgnore
     public String getStringTree(){
         final StringBuilder output = new StringBuilder();
-
         iterateTree((level, node)->{
             output.append("＿＿＿＿".repeat(Math.max(0, level)));
             output.append(node.getName());
@@ -104,7 +133,7 @@ public class Node {
         });
         return output.toString();
     }
-
+    @JsonIgnore
     public String getHtmlTree(){
         String stringTree = getStringTree();
         return "<HTML>\n" +
@@ -116,6 +145,17 @@ public class Node {
                 "</HTML>";
     }
 
+    @JsonIgnore
+    public String getJsonTree(){
+        try {
+            return new
+                    ObjectMapper().writerWithDefaultPrettyPrinter().
+                    writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void writeHtmlFileTree(String fileName){
         try {
             String text = getHtmlTree();
@@ -125,6 +165,37 @@ public class Node {
             System.out.println("Ошибка записи в файл: " + e.getMessage());
         }
     }
+
+    public void writeJsonFileTree(String fileName){
+        try {
+            String text = getJsonTree();
+            Path filePath = Path.of(fileName+".json");
+            Files.writeString(filePath, text);
+        } catch (IOException e) {
+            System.out.println("Ошибка записи в файл: " + e.getMessage());
+        }
+    }
+
+    public static Node readJsonFileTree(String fileName){
+        try {
+            String file = Files.readString(Path.of(fileName+".json"));
+            return new ObjectMapper().readValue(file, Node.class);
+        } catch (IOException e) {
+            System.out.println("Ошибка считывания файла: " + e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Node that = (Node) o;
+        return getName().equals(that.getName()) &&
+                getId().equals(that.getId()) &&
+                getChildren().equals(that.getChildren());
+    }
+
 
 }
 
