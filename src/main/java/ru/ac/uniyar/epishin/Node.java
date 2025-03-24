@@ -140,7 +140,7 @@ public class Node {
                     ObjectMapper().writerWithDefaultPrettyPrinter().
                     writeValueAsString(this);
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("Ошибка преобразования в JSON");
+            throw new RuntimeException("Ошибка преобразования в JSON"+e.getMessage());
         }
     }
 
@@ -150,7 +150,7 @@ public class Node {
             Path filePath = Path.of(fileName+".html");
             Files.writeString(filePath, text);
         } catch (IOException e) {
-            System.out.println("Ошибка записи в файл: " + e.getMessage());
+            throw new RuntimeException("Ошибка записи в файл: " + e.getMessage());
         }
     }
 
@@ -160,7 +160,7 @@ public class Node {
             Path filePath = Path.of(fileName+".json");
             Files.writeString(filePath, text);
         } catch (IOException e) {
-            System.out.println("Ошибка записи в файл: " + e.getMessage());
+            throw new RuntimeException("Ошибка записи в файл: " + e.getMessage());
         }
     }
 
@@ -169,8 +169,7 @@ public class Node {
             String file = Files.readString(Path.of(fileName+".json"));
             return new ObjectMapper().readValue(file, Node.class);
         } catch (IOException e) {
-            System.out.println("Ошибка считывания файла: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Ошибка считывания файла: " + e.getMessage());
         }
     }
 
