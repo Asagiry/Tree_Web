@@ -2,9 +2,6 @@ package ru.ac.uniyar.epishin;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,51 +11,45 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Node {
-    private String _name;
-    private UUID _id;
-    private List<Node> _children;
+    private String name;
+    private UUID id;
+    private List<Node> children;
 
-    public Node(String name) {
-        _name = name;
-        _id = UUID.randomUUID();
-        _children = new ArrayList<Node>();
-    }
-
-    public Node(String name, UUID id, List<Node> children){
-        _name = name;
-        _id = id;
-        _children = children;
+    public Node(String newName) {
+        name = newName;
+        id = UUID.randomUUID();
+        children = new ArrayList<>();
     }
 
     public Node(){
-        _name = "NewNode";
-        _id = UUID.randomUUID();
-        _children = new ArrayList<Node>();
+        name = "NewNode";
+        id = UUID.randomUUID();
+        children = new ArrayList<>();
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
 
     public UUID getId() {
-        return _id;
+        return id;
     }
 
     public List<Node> getChildren() {
-        return _children;
+        return children;
     }
 
-    public void setName(String name){
-        _name = name;
+    public void setName(String newName){
+        name = newName;
     }
 
-    public void setId(UUID id){
-        _id = id;
+    public void setId(UUID newId){
+        id = newId;
     }
 
-    public void setChildren(List<Node> children)
+    public void setChildren(List<Node> newChildren)
     {
-        _children = children;
+        children = newChildren;
     }
 
 
@@ -69,59 +60,55 @@ public class Node {
             throw new IllegalArgumentException("Given node is already father for this node");
 
 
-        if (!_children.contains(child)){
-            _children.add(child);
+        if (!children.contains(child)){
+            children.add(child);
         }
     }
 
     public void removeChildren() {
-        _children.clear();
+        children.clear();
     }
 
     public void removeChildByName(String name) {
-        for (int i = 0;i!= _children.size();i++){
-            if (_children.get(i).getName().equals(name))
+        for (int i = 0;i!= children.size();i++){
+            if (children.get(i).getName().equals(name))
             {
-                _children.remove(i);
+                children.remove(i);
                 break;
             }
         }
     }
 
     public void removeChildById(UUID id) {
-        for (int i = 0;i!= _children.size();i++){
-            if (_children.get(i).getId().toString().equals(id.toString()))
+        for (int i = 0;i!= children.size();i++){
+            if (children.get(i).getId().toString().equals(id.toString()))
             {
-                _children.remove(i);
+                children.remove(i);
                 break;
             }
         }
     }
 
     public Node findChild(String name) {
-        for (int i = 0;i!= _children.size();i++){
-            if (_children.get(i).getName().equals(name))
+        for (int i = 0;i!= children.size();i++){
+            if (children.get(i).getName().equals(name))
             {
-                return _children.get(i);
+                return children.get(i);
             }
         }
         return null;
     }
 
-    public void editName(String name) {
-        _name = name;
-    }
-
     public void iterateTree(TreeIteratorHandler handler){
-        _iterateStaticTree(handler,this,0);
+        iterateStaticTree(handler,this,0);
     }
 
-    private static void _iterateStaticTree(TreeIteratorHandler handler, Node node,int level){
+    private static void iterateStaticTree(TreeIteratorHandler handler, Node node,int level){
         handler.handleNode(level, node);
 
         List<Node> children = node.getChildren();
         for (int i = 0;i!=children.size();i++){
-            Node._iterateStaticTree(handler,children.get(i),level+1);
+            Node.iterateStaticTree(handler,children.get(i),level+1);
         }
     }
     @JsonIgnore
@@ -153,7 +140,7 @@ public class Node {
                     ObjectMapper().writerWithDefaultPrettyPrinter().
                     writeValueAsString(this);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException("Ошибка преобразования в JSON");
         }
     }
 
@@ -199,7 +186,7 @@ public class Node {
 
     @Override
     public int hashCode() {
-        return Objects.hash(_name, _id, _children);
+        return Objects.hash(name, id, children);
     }
 }
 

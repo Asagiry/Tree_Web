@@ -1,12 +1,8 @@
 package ru.ac.uniyar.epishin;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-
-import java.io.Console;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NodeTest {
+class NodeTest {
 
     /*Реализовать структуру данных хранящую в себе дерево
 - Использовать ООП
@@ -136,7 +132,7 @@ public class NodeTest {
     @Test
     void editName(){
         Node root = new Node("Root");
-        root.editName("NewRoot");
+        root.setName("NewRoot");
 
         assertEquals("NewRoot",root.getName());
     }
