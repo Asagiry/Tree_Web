@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Node {
@@ -196,6 +197,9 @@ public class Node {
                 getChildren().equals(that.getChildren());
     }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(_name, _id, _children);
+    }
 }
 
