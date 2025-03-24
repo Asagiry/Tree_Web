@@ -296,7 +296,7 @@ public class NodeTest {
     }
 
     @Test
-    void readJsonFileTest(){
+    void readJsonFileTest() throws IOException {
         Node root = new Node("Root");
         Node a = new Node("a");
         Node b = new Node("b");
@@ -315,6 +315,8 @@ public class NodeTest {
         Node equalsRoot = Node.readJsonFileTree(fileName);
 
         assertEquals(root,equalsRoot);
+
+        Files.delete(Path.of(fileName+".json"));
 
     }
 
