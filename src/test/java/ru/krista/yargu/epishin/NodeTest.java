@@ -1,4 +1,4 @@
-package ru.ac.uniyar.epishin;
+package ru.krista.yargu.epishin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,10 +112,10 @@ class NodeTest {
         root.addChild(firstChildren);
         root.addChild(secondChildren);
 
-        Node found = root.findChild(firstChildren.getName());
+        Node found = root.findChildByName(firstChildren.getName());
         assertEquals(firstChildren.getId(),found.getId());
 
-        found = root.findChild(secondChildren.getName());
+        found = root.findChildByName(secondChildren.getName());
         assertEquals(secondChildren.getId(),found.getId());
 
     }
@@ -124,7 +124,7 @@ class NodeTest {
     void findNotExistChild(){
         Node root = new Node("Root");
 
-        Node notFount = root.findChild("Child");
+        Node notFount = root.findChildByName("Child");
 
         assertNull(notFount);
     }

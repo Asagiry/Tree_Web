@@ -1,4 +1,4 @@
-package ru.ac.uniyar.epishin;
+package ru.krista.yargu.epishin;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Node {
     private String name;
@@ -89,14 +90,38 @@ public class Node {
         }
     }
 
-    public Node findChild(String name) {
-        for (int i = 0;i!= children.size();i++){
-            if (children.get(i).getName().equals(name))
-            {
-                return children.get(i);
+    public Node findChildByName(String name) {
+        AtomicReference<Node> founded = new AtomicReference<>();
+        iterateTree((level, node) -> {
+            if (node.getName().equals(name)) {
+                founded.set(node);
             }
-        }
-        return null;
+        });
+        return founded.get();
+    }
+
+    public Node findChildById(UUID id) {
+        AtomicReference<Node> founded = new AtomicReference<>();
+        iterateTree((level, node) -> {
+            if (node.getId().equals(id)) {
+                founded.set(node);
+            }
+        });
+        return founded.get();
+    }
+
+    public Node findFatherById(UUID id) {
+        AtomicReference<Node> result = new AtomicReference<>();
+
+        iterateTree((level, node) -> {
+            for (Node child : node.getChildren()) {
+                if (id.equals(child.getId())) {
+                    result.set(node);
+                    return;
+                }
+            }
+        });
+        return result.get();
     }
 
     public void iterateTree(TreeIteratorHandler handler){
@@ -115,7 +140,7 @@ public class Node {
     public String getStringTree(){
         final StringBuilder output = new StringBuilder();
         iterateTree((level, node)->{
-            output.append("＿＿＿＿".repeat(Math.max(0, level)));
+            output.append("＿＿".repeat(Math.max(0, level)));
             output.append(node.getName());
             output.append('\n');
         });
@@ -134,43 +159,27 @@ public class Node {
     }
 
     @JsonIgnore
-    public String getJsonTree(){
-        try {
-            return new
-                    ObjectMapper().writerWithDefaultPrettyPrinter().
-                    writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Ошибка преобразования в JSON"+e.getMessage());
-        }
+    public String getJsonTree() throws JsonProcessingException{
+        return new
+                ObjectMapper().writerWithDefaultPrettyPrinter().
+                writeValueAsString(this);
     }
 
-    public void writeHtmlFileTree(String fileName){
-        try {
+    public void writeHtmlFileTree(String fileName) throws IOException{
             String text = getHtmlTree();
             Path filePath = Path.of(fileName+".html");
             Files.writeString(filePath, text);
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка записи в файл: " + e.getMessage());
-        }
     }
 
-    public void writeJsonFileTree(String fileName){
-        try {
+    public void writeJsonFileTree(String fileName) throws IOException{
             String text = getJsonTree();
             Path filePath = Path.of(fileName+".json");
             Files.writeString(filePath, text);
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка записи в файл: " + e.getMessage());
-        }
     }
 
-    public static Node readJsonFileTree(String fileName){
-        try {
+    public static Node readJsonFileTree(String fileName) throws IOException{
             String file = Files.readString(Path.of(fileName+".json"));
             return new ObjectMapper().readValue(file, Node.class);
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка считывания файла: " + e.getMessage());
-        }
     }
 
     @Override

@@ -1,4 +1,4 @@
-package ru.ac.uniyar.epishin;
+package ru.krista.yargu.epishin;
 
 
 public class Main {
