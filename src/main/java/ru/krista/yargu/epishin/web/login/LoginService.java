@@ -1,6 +1,10 @@
-package ru.krista.yargu.epishin.web;
+package ru.krista.yargu.epishin.web.login;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Сервис входа: проверяет логин и пароль, на соответствие записанным в базу данных.

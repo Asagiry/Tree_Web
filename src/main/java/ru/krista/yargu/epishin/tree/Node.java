@@ -1,7 +1,9 @@
-package ru.krista.yargu.epishin;
+package ru.krista.yargu.epishin.tree;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,10 +24,12 @@ public class Node {
         children = new ArrayList<>();
     }
 
-    public Node(){
-        name = "NewNode";
-        id = UUID.randomUUID();
-        children = new ArrayList<>();
+    public Node(@JsonProperty("name") String name,
+                @JsonProperty("id") UUID id,
+                @JsonProperty("children") List<Node> children) {
+        this.name = name != null ? name : "NewNode";
+        this.id = id != null ? id : UUID.randomUUID();
+        this.children = children != null ? children : new ArrayList<>();
     }
 
     public String getName() {
@@ -53,13 +57,10 @@ public class Node {
         children = newChildren;
     }
 
-
-
     public void addChild(Node child)  {
 
         if (child.getChildren().contains(this))
             throw new IllegalArgumentException("Given node is already father for this node");
-
 
         if (!children.contains(child)){
             children.add(child);
@@ -124,6 +125,16 @@ public class Node {
         return result.get();
     }
 
+    public void deleteChildById(UUID id){
+        Node father = findFatherById(id);
+        Node toDelete = findChildById(id);
+        if (father!=null){
+            List<Node> fatherChildren = father.getChildren();
+            fatherChildren.remove(toDelete);
+            father.setChildren(fatherChildren);
+        }
+    }
+
     public void iterateTree(TreeIteratorHandler handler){
         iterateStaticTree(handler,this,0);
     }
@@ -140,7 +151,7 @@ public class Node {
     public String getStringTree(){
         final StringBuilder output = new StringBuilder();
         iterateTree((level, node)->{
-            output.append("＿＿".repeat(Math.max(0, level)));
+            output.append("  ".repeat(Math.max(0, level)));
             output.append(node.getName());
             output.append('\n');
         });

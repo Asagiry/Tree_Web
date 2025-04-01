@@ -44,27 +44,21 @@ public class ListPresentationController {
     @Path("/")
     @Produces("text/html")
     public String getList() {
-        String result =
-                "<html>" +
-                "  <head>" +
-                "    <title>Вывод списка</title>" +
-                "  </head>" +
-                "  <body>" +
-                "    <h1>Список</h1>" +
-                "    <ul>";
+        StringBuilder result =
+                new StringBuilder("<html>" +
+                        "  <head>" +
+                        "    <title>Вывод списка</title>" +
+                        "  </head>" +
+                        "  <body>" +
+                        "    <h1>Список</h1>" +
+                        "    <ul>");
 
         for (int i = 0; i < list.size(); i++) {
             String listItem = list.get(i);
-            result += "<li>" + listItem + " <a href=\"edit/" + i + "\">Редактировать</a> </li>";
+            result.append("<li>").append(listItem).append(" <a href=\"edit/").append(i).append("\">Редактировать</a> </li>");
         }
-        result += "    </ul>" +
-                "      <br/>" +
-                "      <form method=\"post\" action=\"add_random_item\">" +
-                "        <input type=\"submit\" value=\"Add random item\"/>" +
-                "      </form>" +
-                "  </body>" +
-                "</html>";
-        return result;
+        result.append("    </ul>" + "      <br/>" + "      <form method=\"post\" action=\"add_random_item\">" + "        <input type=\"submit\" value=\"Add random item\"/>" + "      </form>" + "  </body>" + "</html>");
+        return result.toString();
     }
 
     /**
@@ -94,8 +88,8 @@ public class ListPresentationController {
     @Produces("text/html")
     public String getEditPage(@PathParam("id") int itemId) {
         String listItem = list.get(itemId);
-        String result =
-                "<html>" +
+        return
+                        "<html>" +
                         "  <head>" +
                         "    <title>Редактирование элемента списка</title>" +
                         "  </head>" +
@@ -104,12 +98,10 @@ public class ListPresentationController {
                         "    <form method=\"post\" action=\"/edit/" + itemId + "\">" +
                         "      <p>Значение</p>" +
                         "      <input type=\"text\" name=\"value\" value=\"" + listItem +"\"/>" +
-                        "      <input type=\"submit\"/>";
-        result +=
-                "            </form>" +
-                "  </body>" +
-                "</html>";
-        return result;
+                        "      <input type=\"submit\"/>"+
+                        "            </form>" +
+                        "  </body>" +
+                        "</html>";
     }
 
     /**
