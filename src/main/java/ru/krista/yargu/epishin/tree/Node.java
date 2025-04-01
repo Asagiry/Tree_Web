@@ -127,8 +127,8 @@ public class Node {
 
     public void deleteChildById(UUID id){
         Node father = findFatherById(id);
-        Node toDelete = findChildById(id);
         if (father!=null){
+            Node toDelete = findChildById(id);
             List<Node> fatherChildren = father.getChildren();
             fatherChildren.remove(toDelete);
             father.setChildren(fatherChildren);
