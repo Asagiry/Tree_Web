@@ -3,12 +3,20 @@ package ru.krista.yargu.epishin;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import ru.krista.yargu.epishin.tree.Node;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 class NodeTest {
 
@@ -26,6 +34,8 @@ class NodeTest {
      */
 
 
+
+
     @Test
     void createTree(){
         Node root = new Node("Root");
@@ -35,11 +45,68 @@ class NodeTest {
     }
 
     @Test
+    void createParamTree(){
+        String name = "template";
+        UUID id = UUID.randomUUID();
+        List<Node> children = List.of(
+                new Node("a"),
+                new Node("b"),
+                new Node("c")
+        );
+
+        Node test = new Node(name,id,children);
+
+        assertEquals(name,test.getName());
+        assertEquals(id,test.getId());
+        assertEquals(children,test.getChildren());
+    }
+
+    @Test
+    void setName(){
+        Node root = new Node("Root");
+        root.setName("NewRoot");
+
+        assertEquals("NewRoot",root.getName());
+    }
+
+    @Test
+    void setId(){
+        Node root = new Node("Root");
+        UUID newUUID = UUID.randomUUID();
+        root.setId(newUUID);
+
+        assertEquals(newUUID,root.getId());
+    }
+
+    @Test
+    void setChildren(){
+        Node root = new Node("Root");
+        Node a = new Node("a");
+        Node b = new Node("b");
+
+        List<Node> children = List.of(a,b);
+        root.setChildren(children);
+
+        assertEquals(children,root.getChildren());
+    }
+
+    @Test
     void addNode(){
         Node root = new Node("Root");
         Node child = new Node("Child");
         root.addChild(child);
         assertEquals(child.getId(),root.getChildren().get(0).getId());
+    }
+
+    @Test
+    void addNodeToChild(){
+        Node father = new Node("Father");
+        Node child = new Node("Child");
+        father.addChild(child);
+
+        assertThrows(Exception.class, () -> {
+            child.addChild(father);
+        });
     }
 
     @Test
@@ -53,14 +120,16 @@ class NodeTest {
     }
 
     @Test
-    void addNodeToChild(){
-        Node father = new Node("Father");
-        Node child = new Node("Child");
-        father.addChild(child);
+    void removeAllChildren(){
+        Node root = new Node("Root");
+        Node firstChild = new Node("FirstChild");
+        Node secondChild = new Node("SecondChild");
+        root.addChild(firstChild);
+        root.addChild(secondChild);
 
-        assertThrows(Exception.class, () -> {
-            child.addChild(father);
-        });
+        root.removeChildren();
+
+        assertEquals(0,root.getChildren().size());
     }
 
     @Test
@@ -92,20 +161,45 @@ class NodeTest {
     }
 
     @Test
-    void removeAllChildren(){
+    void findChildById(){
         Node root = new Node("Root");
-        Node firstChild = new Node("FirstChild");
-        Node secondChild = new Node("SecondChild");
-        root.addChild(firstChild);
-        root.addChild(secondChild);
+        Node firstChildren = new Node("FirstChildren");
+        Node secondChildren = new Node("SecondChildren");
+        root.addChild(firstChildren);
+        root.addChild(secondChildren);
 
-        root.removeChildren();
+        Node found = root.findChildById(firstChildren.getId());
+        assertEquals(firstChildren.getId(),found.getId());
 
-        assertEquals(0,root.getChildren().size());
+        found = root.findChildById(secondChildren.getId());
+        assertEquals(secondChildren.getId(),found.getId());
     }
 
     @Test
-    void findChild(){
+    void findDeepChildById(){
+        Node root = new Node("Root");
+        Node a = new Node("a");
+        Node b = new Node("b");
+        Node c = new Node("c");
+        Node d = new Node("d");
+        Node e = new Node("e");
+        Node f = new Node("f");
+        root.addChild(a);
+        root.addChild(b);
+        a.addChild(c);
+        a.addChild(d);
+        b.addChild(e);
+        b.addChild(f);
+
+        Node foundE = root.findChildById(e.getId());
+        Node foundF = root.findChildById(f.getId());
+
+        assertEquals(foundE,e);
+        assertEquals(foundF,f);
+    }
+
+    @Test
+    void findChildByName(){
         Node root = new Node("Root");
         Node firstChildren = new Node("FirstChildren");
         Node secondChildren = new Node("SecondChildren");
@@ -121,20 +215,96 @@ class NodeTest {
     }
 
     @Test
-    void findNotExistChild(){
+    void findDeepChildByName(){
         Node root = new Node("Root");
+        Node a = new Node("a");
+        Node b = new Node("b");
+        Node c = new Node("c");
+        Node d = new Node("d");
+        Node e = new Node("e");
+        Node f = new Node("f");
+        root.addChild(a);
+        root.addChild(b);
+        a.addChild(c);
+        a.addChild(d);
+        b.addChild(e);
+        b.addChild(f);
 
-        Node notFount = root.findChildByName("Child");
+        Node foundE = root.findChildByName(e.getName());
+        Node foundF = root.findChildByName(f.getName());
 
-        assertNull(notFount);
+        assertEquals(foundE,e);
+        assertEquals(foundF,f);
     }
 
     @Test
-    void editName(){
+    void findNonExistChildByName(){
         Node root = new Node("Root");
-        root.setName("NewRoot");
 
-        assertEquals("NewRoot",root.getName());
+        Node notFound = root.findChildByName("Child");
+
+        assertNull(notFound);
+    }
+
+    @Test
+    void findNonExistChildById(){
+        Node root = new Node("Root");
+
+        Node notFound = root.findChildById(UUID.randomUUID());
+
+        assertNull(notFound);
+    }
+
+    @Test
+    void findFatherById(){
+        Node root = new Node("Root");
+        Node a = new Node("a");
+        Node b = new Node("b");
+        Node c = new Node("c");
+        Node d = new Node("d");
+        Node e = new Node("e");
+        Node f = new Node("f");
+        root.addChild(a);
+        root.addChild(b);
+        a.addChild(c);
+        a.addChild(d);
+        b.addChild(e);
+        b.addChild(f);
+
+        Node fatherC = root.findFatherById(c.getId());
+        Node fatherD = root.findFatherById(d.getId());
+        Node fatherE = root.findFatherById(e.getId());
+        Node fatherF = root.findFatherById(f.getId());
+        Node fatherA = root.findFatherById(a.getId());
+        Node fatherB = root.findFatherById(b.getId());
+        Node fatherRoot = root.findFatherById(root.getId());
+
+        assertEquals(a,fatherC);
+        assertEquals(a,fatherD);
+        assertEquals(b,fatherE);
+        assertEquals(b,fatherF);
+        assertEquals(root,fatherA);
+        assertEquals(root,fatherB);
+        assertNull(fatherRoot);
+
+
+    }
+
+    @Test
+    void deleteChildById(){
+        Node root = new Node("Root");
+        Node a = new Node("a");
+        Node b = new Node("b");
+        root.addChild(a);
+        a.addChild(b);
+        root.deleteChildById(b.getId());
+
+        assertEquals(0,a.getChildren().size());
+        assertEquals(1,root.getChildren().size());
+
+        root.deleteChildById(a.getId());
+
+        assertEquals(0,root.getChildren().size());
     }
 
     @Test
@@ -145,11 +315,13 @@ class NodeTest {
         Node c = new Node("c");
         Node d = new Node("d");
         Node e = new Node("e");
+        Node f = new Node("f");
         root.addChild(a);
         root.addChild(b);
         a.addChild(c);
         a.addChild(d);
         b.addChild(e);
+        b.addChild(f);
 
         AtomicInteger count = new AtomicInteger(0);
         root.iterateTree((level, node)->{
@@ -158,7 +330,7 @@ class NodeTest {
             }
             count.incrementAndGet();
         });
-        assertEquals(6,count.get());
+        assertEquals(7,count.get());
     }
     @Test
     void getStringTreeTest() {
@@ -175,12 +347,14 @@ class NodeTest {
         b.addChild(e);
 
         String actual = root.getStringTree();
-        String expected = "Root\n" +
-                "＿＿＿＿a\n" +
-                "＿＿＿＿＿＿＿＿c\n" +
-                "＿＿＿＿＿＿＿＿d\n" +
-                "＿＿＿＿b\n" +
-                "＿＿＿＿＿＿＿＿e\n";
+        String expected = """
+                Root
+                  a
+                    c
+                    d
+                  b
+                    e
+                """;
 
         assertEquals(expected,actual);
     }
@@ -200,12 +374,13 @@ class NodeTest {
         b.addChild(e);
 
         String actual = root.getHtmlTree();
-        String expected = "<HTML>\n" +
-                "<HEAD>\n" +
-                "<BODY>\n" +
-                "Root<br>＿＿＿＿a<br>＿＿＿＿＿＿＿＿c<br>＿＿＿＿＿＿＿＿d<br>＿＿＿＿b<br>＿＿＿＿＿＿＿＿e<br></BODY>\n" +
-                "</HEAD>\n" +
-                "</HTML>";
+        String expected = """
+                <HTML>
+                <HEAD>
+                <BODY>
+                Root<br>  a<br>    c<br>    d<br>  b<br>    e<br></BODY>
+                </HEAD>
+                </HTML>""";
         assertEquals(expected,actual);
     }
 

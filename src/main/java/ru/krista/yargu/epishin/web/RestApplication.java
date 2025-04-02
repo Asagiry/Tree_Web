@@ -1,7 +1,8 @@
 package ru.krista.yargu.epishin.web;
 
-import ru.krista.yargu.epishin.Node;
+import ru.krista.yargu.epishin.tree.Node;
 import ru.krista.yargu.epishin.web.list.ListPresentationController;
+import ru.krista.yargu.epishin.web.login.LoginController;
 import ru.krista.yargu.epishin.web.tree.TreePresentationController;
 
 import javax.ws.rs.core.Application;
@@ -15,22 +16,22 @@ import java.util.Set;
  */
 public class RestApplication extends Application {
 
-    private List<String> list = new ArrayList<>();
-    private Node tree = new Node("tree");
+    private final List<String> list = new ArrayList<>();
+    private final Node tree = new Node("tree");
 
     public RestApplication() {
-        ListInit();
-        TreeInit();
+        listInit();
+        treeInit();
     }
 
-    private void ListInit(){
+    private void listInit(){
         list.add("aaa");
         list.add("bbb");
         list.add("ccc");
         list.add("ddd");
     }
 
-    private void TreeInit(){
+    private void treeInit(){
         Node a = new Node("a");
         Node b = new Node("b");
         Node c = new Node("c");

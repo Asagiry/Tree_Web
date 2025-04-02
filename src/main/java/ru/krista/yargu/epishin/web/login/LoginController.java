@@ -1,6 +1,10 @@
-package ru.krista.yargu.epishin.web;
+package ru.krista.yargu.epishin.web.login;
 
-import javax.ws.rs.*;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,12 +15,12 @@ import java.net.URISyntaxException;
 @Path("/login")
 public class LoginController {
 
-    private LoginService loginService = new LoginService();
+    private final LoginService loginService = new LoginService();
 
     @GET
     @Produces("text/html")
     public String getForm() {
-        String result =
+        return
             "<html>" +
             "  <head>" +
             "    <title>Вход</title>" +
@@ -32,7 +36,6 @@ public class LoginController {
             "    </form>" +
             "  </body>" +
             "</html>";
-        return result;
     }
 
     @POST
@@ -53,7 +56,7 @@ public class LoginController {
     @Path("/success")
     @Produces("text/html")
     public String getSuccessPage() {
-        String result =
+        return
                 "<html>" +
                 "  <head>" +
                 "    <title>Успешный вход</title>" +
@@ -63,14 +66,13 @@ public class LoginController {
                 "    <a href=\"/login\">Назад</a>" +
                 "  </body>" +
                 "</html>";
-        return result;
     }
 
     @GET
     @Path("/failure")
     @Produces("text/html")
     public String getFailurePage() {
-        String result =
+        return
                 "<html>" +
                 "  <head>" +
                 "    <title>Ошибка входа</title>" +
@@ -80,6 +82,5 @@ public class LoginController {
                 "    <a href=\"/login\">Назад</a>" +
                 "  </body>" +
                 "</html>";
-        return result;
     }
 }
