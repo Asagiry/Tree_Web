@@ -1,6 +1,7 @@
 package ru.krista.yargu.epishin.web.tree;
 
 import ru.krista.yargu.epishin.tree.Node;
+import ru.krista.yargu.epishin.web.utils.Constants;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -16,9 +17,9 @@ import java.util.UUID;
 /**
  * Контроллер отвечающий за представление списка.
  */
-@Path("/tree")
+@Path(Constants.TREE_BASE_PATH)
 public class TreePresentationController {
-    private Node tree;
+    private final Node tree;
 
     /**
      * Запоминает дерево, с которым будет работать.
@@ -46,14 +47,15 @@ public class TreePresentationController {
                 .append("    <h1>Дерево</h1>")
                 .append("    <ul>");
         tree.iterateTree((level, node) -> resultBuilder.append("<br>")
-                .append(" <a href=\"/tree/edit/")
+                .append(" <a href=\"").append(Constants.TREE_BASE_PATH).append("/edit/")
                 .append(node.getId())
                 .append("\" style=\"color: blue; text-decoration: none;\">")  // Фиксированный стиль
                 .append("____".repeat(level))
                 .append(node.getName())
                 .append("</a>"));
         resultBuilder.append("</ul>")
-                .append("      <br/>").append("      <form method=\"post\" action=\"/tree/add/\">")
+                .append("      <br/>")
+                .append("      <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/add/\">")
                 .append("        <input type=\"submit\" value=\"Добавить элемент к корню\"/>")
                 .append("      </form>")
                 .append("  </body>")
@@ -70,9 +72,9 @@ public class TreePresentationController {
     @Path("add/")
     @Produces("text/html")
     public Response add(){
-        tree.addChild(new Node("zzz"));
+        tree.addChild(new Node("ZZZ"));
         try {
-            return Response.seeOther(new URI("/tree")).build();
+            return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Ошибка построения URI для перенаправления");
         }
@@ -82,18 +84,13 @@ public class TreePresentationController {
     @Produces("text/html")
     public Response add(@PathParam("parentId") UUID parentId) {
         Node parent = tree.findChildById(parentId);
-        if (parent == null) {
-            parent = tree; // если не найден, добавляем в корень
-        }
-        parent.addChild(new Node("zzz"));
+        parent.addChild(new Node("ZZZ"));
         try {
-            return Response.seeOther(new URI("/tree")).build();
+            return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Ошибка построения URI для перенаправления");
         }
     }
-
-
 
     /**
      * Выводит страничку для редактирования одного элемента.
@@ -113,16 +110,16 @@ public class TreePresentationController {
                 .append("  </head>")
                 .append("  <body>")
                 .append("    <h1>Редактирование элемента дерева</h1>")
-                .append("    <form method=\"post\" action=\"/tree/edit/").append(itemId).append("\">")
+                .append("    <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/edit/").append(itemId).append("\">")
                 .append("      <p>Значение</p>")
                 .append("      <input type=\"text\" name=\"value\" value=\"").append(treeItem.getName()).append("\"/>")
                 .append("      <input type=\"submit\" value=\"Сохранить\"/>")
                 .append("    </form>")
-                .append("    <form method=\"post\" action=\"/tree/add/").append(itemId).append("\">")
+                .append("    <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/add/").append(itemId).append("\">")
                 .append("      <input type=\"submit\" value=\"Добавить элемент\"/>")
                 .append("    </form>");
         if (!itemId.equals(tree.getId())) {
-            result.append("    <form method=\"post\" action=\"/tree/delete/").append(itemId).append("\">")
+            result.append("    <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/delete/").append(itemId).append("\">")
                     .append("      <input type=\"submit\" value=\"Удалить элемент\"/>")
                     .append("    </form>");
         }
@@ -144,7 +141,7 @@ public class TreePresentationController {
         Node edited = tree.findChildById(itemId);
         edited.setName(name);
         try {
-            return Response.seeOther(new URI("/tree")).build();
+            return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Ошибка построения URI для перенаправления");
         }
@@ -161,7 +158,7 @@ public class TreePresentationController {
     public Response deleteItem(@PathParam("id") UUID itemId) {
         tree.deleteChildById(itemId);
         try {
-            return Response.seeOther(new URI("/tree")).build();
+            return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Ошибка построения URI для перенаправления");
         }

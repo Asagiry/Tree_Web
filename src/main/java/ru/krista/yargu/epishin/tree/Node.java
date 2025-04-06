@@ -132,6 +132,7 @@ public class Node {
             List<Node> fatherChildren = father.getChildren();
             fatherChildren.remove(toDelete);
             father.setChildren(fatherChildren);
+            toDelete.removeChildren();
         }
     }
 
