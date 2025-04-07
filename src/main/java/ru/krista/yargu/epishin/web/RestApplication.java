@@ -1,14 +1,14 @@
 package ru.krista.yargu.epishin.web;
 
-import ru.krista.yargu.epishin.tree.Node;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import ru.krista.yargu.epishin.exceptions.login.InitDBLoginException;
 import ru.krista.yargu.epishin.tree.NodeStorage;
 import ru.krista.yargu.epishin.web.list.ListPresentationController;
 import ru.krista.yargu.epishin.web.login.LoginController;
 import ru.krista.yargu.epishin.web.tree.TreePresentationController;
-import ru.krista.yargu.epishin.web.utils.Constants;
 
 import javax.ws.rs.core.Application;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +18,7 @@ import java.util.Set;
  * Web-приложение в котором регистрируются все ресурсы.
  */
 public class RestApplication extends Application {
+    private final Logger logger = LogManager.getLogger();
 
     private final List<String> list = new ArrayList<>();
     private final NodeStorage treeStorage = new NodeStorage();
@@ -44,7 +45,12 @@ public class RestApplication extends Application {
         Set<Object> resources = new HashSet<>();
         resources.add(new ListPresentationController(list));
         resources.add(new TreePresentationController(treeStorage));
-        resources.add(new LoginController());
+
+        try {
+            resources.add(new LoginController());
+        } catch (InitDBLoginException _) {
+
+        }
         return resources;
     }
 

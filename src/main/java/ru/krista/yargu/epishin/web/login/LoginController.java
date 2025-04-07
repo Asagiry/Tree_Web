@@ -1,5 +1,12 @@
 package ru.krista.yargu.epishin.web.login;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import ru.krista.yargu.epishin.exceptions.login.AuthDBLoginException;
+import ru.krista.yargu.epishin.exceptions.login.InitDBLoginException;
+import ru.krista.yargu.epishin.web.utils.Constants;
+import ru.krista.yargu.epishin.web.utils.HtmlBuilder;
+
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -12,30 +19,30 @@ import java.net.URISyntaxException;
 /**
  * Контроллер входа: выдает и обрабатывает форму входа.
  */
-@Path("/login")
+@Path(Constants.LOGIN_BASE_PATH)
 public class LoginController {
 
-    private final LoginService loginService = new LoginService();
+    private final Logger logger = LogManager.getLogger();
+    private final LoginService loginService;
+
+    public LoginController() throws InitDBLoginException {
+        loginService = new LoginService();
+    }
+
 
     @GET
     @Produces("text/html")
     public String getForm() {
-        return
-            "<html>" +
-            "  <head>" +
-            "    <title>Вход</title>" +
-            "  </head>" +
-            "  <body>" +
+        return HtmlBuilder.buildStart("Вход")+
             "    <h1>Вход</h1>" +
-            "    <form method=\"post\" action=\"/login/\">" +
+            "    <form method=\"post\" action=\""+Constants.LOGIN_BASE_PATH+"\">" +
             "      <label for=\"uname\"><b>Username</b></label>\n" +
             "      <input type=\"text\" placeholder=\"Enter Username\" name=\"username\" required>\n" +
             "      <label for=\"psw\"><b>Password</b></label>\n" +
             "      <input type=\"password\" placeholder=\"Enter Password\" name=\"password\" required>\n" +
             "      <button type=\"submit\">Login</button>" +
             "    </form>" +
-            "  </body>" +
-            "</html>";
+            HtmlBuilder.buildEnd();
     }
 
     @POST
@@ -43,13 +50,21 @@ public class LoginController {
     public Response login(@FormParam("username") String username, @FormParam("password") String password) {
         try {
             if (loginService.login(username, password)) {
-                return Response.seeOther(new URI("/login/success")).build();
+                return Response.seeOther(new URI(Constants.LOGIN_SUCCESS_PATH)).build();
             } else {
-                return Response.seeOther(new URI("/login/failure")).build();
+                return Response.seeOther(new URI(Constants.LOGIN_FAILURE_PATH)).build();
             }
         } catch (URISyntaxException e) {
-            throw new IllegalStateException("Ошибка построения URI для перенаправления");
+            throw new IllegalStateException(Constants.URI_SYNTAX_ERROR_MESSAGE);
+        } catch (AuthDBLoginException e) {
+            logger.error(e.getMessage(),e.getCause());
+            try {
+                return Response.seeOther(new URI(Constants.LOGIN_BASE_PATH)).build();
+            } catch (URISyntaxException ex) {
+                throw new IllegalStateException(Constants.URI_SYNTAX_ERROR_MESSAGE);
+            }
         }
+
     }
 
     @GET
@@ -57,15 +72,10 @@ public class LoginController {
     @Produces("text/html")
     public String getSuccessPage() {
         return
-                "<html>" +
-                "  <head>" +
-                "    <title>Успешный вход</title>" +
-                "  </head>" +
-                "  <body>" +
+                HtmlBuilder.buildStart("Успешный вход")+
                 "    <h1>Успешный вход</h1>" +
-                "    <a href=\"/login\">Назад</a>" +
-                "  </body>" +
-                "</html>";
+                "    <a href=\""+Constants.LOGIN_BASE_PATH+"\">Назад</a>" +
+                HtmlBuilder.buildEnd();
     }
 
     @GET
@@ -73,14 +83,9 @@ public class LoginController {
     @Produces("text/html")
     public String getFailurePage() {
         return
-                "<html>" +
-                "  <head>" +
-                "    <title>Ошибка входа</title>" +
-                "  </head>" +
-                "  <body>" +
+               HtmlBuilder.buildStart("Ошибка входа")+
                 "    <h1>Ошибка входа</h1>" +
-                "    <a href=\"/login\">Назад</a>" +
-                "  </body>" +
-                "</html>";
+                "    <a href=\""+Constants.LOGIN_BASE_PATH+">Назад</a>" +
+                HtmlBuilder.buildEnd();
     }
 }

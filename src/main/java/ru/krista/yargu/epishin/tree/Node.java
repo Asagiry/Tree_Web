@@ -12,11 +12,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class Node {
     private String name;
     private UUID id;
     private List<Node> children;
+    private final Logger logger = LogManager.getLogger();
 
     public Node(String newName) {
         name = newName;
@@ -59,8 +63,10 @@ public class Node {
 
     public void addChild(Node child)  {
 
-        if (child.getChildren().contains(this))
-            throw new IllegalArgumentException("Given node is already father for this node");
+        if (child.getChildren().contains(this)) {
+            logger.error( "Циклическая зависимость: добавляемая нода {}"+
+                             " уже является родителем для {}",child.getName(),this.getName());
+        }
 
         if (!children.contains(child)){
             children.add(child);

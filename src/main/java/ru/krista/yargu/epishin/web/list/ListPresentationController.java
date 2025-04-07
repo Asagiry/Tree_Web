@@ -1,5 +1,8 @@
 package ru.krista.yargu.epishin.web.list;
 
+import ru.krista.yargu.epishin.web.utils.Constants;
+import ru.krista.yargu.epishin.web.utils.HtmlBuilder;
+
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -44,20 +47,26 @@ public class ListPresentationController {
     @Path("/")
     @Produces("text/html")
     public String getList() {
-        StringBuilder result =
-                new StringBuilder("<html>" +
-                        "  <head>" +
-                        "    <title>Вывод списка</title>" +
-                        "  </head>" +
-                        "  <body>" +
-                        "    <h1>Список</h1>" +
-                        "    <ul>");
+        StringBuilder result = new StringBuilder()
+                .append(HtmlBuilder.buildStart("Вывод списка"))
+                .append("    <h1>Список</h1>")
+                .append("    <ul>");
 
         for (int i = 0; i < list.size(); i++) {
-            String listItem = list.get(i);
-            result.append("<li>").append(listItem).append(" <a href=\"edit/").append(i).append("\">Редактировать</a> </li>");
+            result.append("<li>")
+                    .append(list.get(i))
+                    .append(" <a href=\"edit/")
+                    .append(i)
+                    .append("\">Редактировать</a> </li>");
         }
-        result.append("    </ul>" + "      <br/>" + "      <form method=\"post\" action=\"add_random_item\">" + "        <input type=\"submit\" value=\"Add random item\"/>" + "      </form>" + "  </body>" + "</html>");
+
+        result.append("    </ul>")
+                .append("      <br/>")
+                .append("      <form method=\"post\" action=\"add_random_item\">")
+                .append("        <input type=\"submit\" value=\"Add random item\"/>")
+                .append("      </form>")
+                .append(HtmlBuilder.buildEnd());
+
         return result.toString();
     }
 
@@ -74,7 +83,7 @@ public class ListPresentationController {
         try {
             return Response.seeOther(new URI("/")).build();
         } catch (URISyntaxException e) {
-            throw new IllegalStateException("Ошибка построения URI для перенаправления");
+            throw new IllegalStateException(Constants.URI_SYNTAX_ERROR_MESSAGE);
         }
     }
 
@@ -88,20 +97,15 @@ public class ListPresentationController {
     @Produces("text/html")
     public String getEditPage(@PathParam("id") int itemId) {
         String listItem = list.get(itemId);
-        return
-                        "<html>" +
-                        "  <head>" +
-                        "    <title>Редактирование элемента списка</title>" +
-                        "  </head>" +
-                        "  <body>" +
-                        "    <h1>Редактирование элемента списка</h1>" +
-                        "    <form method=\"post\" action=\"/edit/" + itemId + "\">" +
-                        "      <p>Значение</p>" +
-                        "      <input type=\"text\" name=\"value\" value=\"" + listItem +"\"/>" +
-                        "      <input type=\"submit\"/>"+
-                        "            </form>" +
-                        "  </body>" +
-                        "</html>";
+
+        return HtmlBuilder.buildStart("Редактирование элемента списка") +
+                "    <h1>Редактирование элемента списка</h1>" +
+                "    <form method=\"post\" action=\"/edit/" + itemId + "\">" +
+                "      <p>Значение</p>" +
+                "      <input type=\"text\" name=\"value\" value=\"" + listItem + "\"/>" +
+                "      <input type=\"submit\" value=\"Сохранить\"/>" +
+                "    </form>" +
+                HtmlBuilder.buildEnd();
     }
 
     /**
@@ -117,7 +121,7 @@ public class ListPresentationController {
         try {
             return Response.seeOther(new URI("/")).build();
         } catch (URISyntaxException e) {
-            throw new IllegalStateException("Ошибка построения URI для перенаправления");
+            throw new IllegalStateException(Constants.URI_SYNTAX_ERROR_MESSAGE);
         }
     }
 
@@ -128,11 +132,7 @@ public class ListPresentationController {
     @Path("nested_list")
     @Produces("text/html")
     public String getNestedListExample() {
-        return "<html>" +
-                "  <head>" +
-                "    <title>Hello world</title>" +
-                "  </head>" +
-                "  <body>" +
+        return HtmlBuilder.buildStart("Hello world")+
                 "    <h1>Hello world</h1>" +
                 "    <ul>" +
                 "      <li>1</li>" +
@@ -143,8 +143,7 @@ public class ListPresentationController {
                 "        </ul>" +
                 "      </li>" +
                 "    </ul>" +
-                "  </body>" +
-                "</html>";
+                HtmlBuilder.buildEnd();
     }
 
 }

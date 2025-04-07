@@ -3,6 +3,7 @@ package ru.krista.yargu.epishin.web.tree;
 import ru.krista.yargu.epishin.tree.Node;
 import ru.krista.yargu.epishin.tree.NodeStorage;
 import ru.krista.yargu.epishin.web.utils.Constants;
+import ru.krista.yargu.epishin.web.utils.HtmlBuilder;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -20,7 +21,6 @@ import java.util.UUID;
  */
 @Path(Constants.TREE_BASE_PATH)
 public class TreePresentationController {
-    private final TreeServise treeServise = new TreeServise();
     private final NodeStorage treeStorage;
 
     /**
@@ -41,11 +41,7 @@ public class TreePresentationController {
     public String getTree() {
         StringBuilder resultBuilder = new StringBuilder();
 
-        resultBuilder.append("<html>")
-                .append("  <head>")
-                .append("    <title>Вывод дерева</title>")
-                .append("  </head>")
-                .append("  <body>")
+        resultBuilder.append(HtmlBuilder.buildStart("Вывод дерева"))
                 .append("    <h1>Дерево</h1>")
                 .append("    <ul>");
         treeStorage.getTree().iterateTree((level, node) -> resultBuilder.append("<br>")
@@ -57,11 +53,8 @@ public class TreePresentationController {
                 .append("</a>"));
         resultBuilder.append("</ul>")
                 .append("      <br/>")
-                .append("      <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/add/\">")
-                .append("        <input type=\"submit\" value=\"Добавить элемент к корню\"/>")
-                .append("      </form>")
-                .append("  </body>")
-                .append("</html>");
+                .append(HtmlBuilder.buildFormPost(Constants.TREE_ADD_PATH,"","Добавить элемент к корню"))
+                .append(HtmlBuilder.buildEnd());
 
         return resultBuilder.toString();
     }
@@ -79,7 +72,7 @@ public class TreePresentationController {
         try {
             return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
-            throw new IllegalStateException("Ошибка построения URI для перенаправления");
+            throw new IllegalStateException(Constants.URI_SYNTAX_ERROR_MESSAGE);
         }
     }
     @POST
@@ -92,7 +85,7 @@ public class TreePresentationController {
         try {
             return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
-            throw new IllegalStateException("Ошибка построения URI для перенаправления");
+            throw new IllegalStateException(Constants.URI_SYNTAX_ERROR_MESSAGE);
         }
     }
 
@@ -107,27 +100,18 @@ public class TreePresentationController {
     public String getEditPage(@PathParam("id") UUID itemId) {
         Node treeItem = treeStorage.getTree().findChildById(itemId);
         StringBuilder result = new StringBuilder();
-        result.append("<html>")
-                .append("  <head>")
-                .append("    <title>Редактирование элемента дерева</title>")
-                .append("  </head>")
-                .append("  <body>")
+        result.append(HtmlBuilder.buildStart("Редактирование элемента дерева"))
                 .append("    <h1>Редактирование элемента дерева</h1>")
                 .append("    <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/edit/").append(itemId).append("\">")
                 .append("      <p>Значение</p>")
                 .append("      <input type=\"text\" name=\"value\" value=\"").append(treeItem.getName()).append("\"/>")
                 .append("      <input type=\"submit\" value=\"Сохранить\"/>")
                 .append("    </form>")
-                .append("    <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/add/").append(itemId).append("\">")
-                .append("      <input type=\"submit\" value=\"Добавить элемент\"/>")
-                .append("    </form>");
+                .append(HtmlBuilder.buildFormPost(Constants.TREE_ADD_PATH,itemId.toString(),"Добавить элемент"));
         if (!itemId.equals(treeStorage.getTree().getId())) {
-            result.append("    <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/delete/").append(itemId).append("\">")
-                    .append("      <input type=\"submit\" value=\"Удалить элемент\"/>")
-                    .append("    </form>");
+            result.append(HtmlBuilder.buildFormPost(Constants.TREE_DELETE_PATH,itemId.toString(),"Удалить элемент"));
         }
-        result.append("  </body>")
-                .append("</html>");
+        result.append(HtmlBuilder.buildEnd());
 
         return result.toString();
     }
@@ -147,7 +131,7 @@ public class TreePresentationController {
         try {
             return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
-            throw new IllegalStateException("Ошибка построения URI для перенаправления");
+            throw new IllegalStateException(Constants.URI_SYNTAX_ERROR_MESSAGE);
         }
     }
 
@@ -165,7 +149,7 @@ public class TreePresentationController {
         try {
             return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
-            throw new IllegalStateException("Ошибка построения URI для перенаправления");
+            throw new IllegalStateException(Constants.URI_SYNTAX_ERROR_MESSAGE);
         }
 
     }
