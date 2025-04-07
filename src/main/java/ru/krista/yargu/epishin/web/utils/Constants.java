@@ -12,5 +12,7 @@ public final class Constants {
     //TREE_PRESENTATION_CONTROLLER
     public static final String TREE_BASE_PATH = "/tree";
 
+    //NODE_STORAGE
+    public static final boolean SAVE_TO_FILE = true;
 
 }

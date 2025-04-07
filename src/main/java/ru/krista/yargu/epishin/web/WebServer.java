@@ -33,17 +33,5 @@ public class WebServer {
         server.deploy(restApplication);
 
         System.out.println("Сервер запущен: "+Constants.SERVER_URL+Constants.TREE_BASE_PATH);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Остановка сервера...");
-            Node tree = restApplication.getTree();
-            try {
-                tree.writeJsonFileTree(Constants.TREE_FILE_PATH);
-                server.stop();
-                System.out.println("Сервер остановлен успешно, дерево сохранено");
-            } catch (IOException e) {
-                System.err.println("Не удалось сохранить дерево: " + e.getMessage());
-            }
-        }));
     }
 }

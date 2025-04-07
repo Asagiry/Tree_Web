@@ -11,7 +11,7 @@ import java.sql.Statement;
  */
 public class LoginService {
 
-    private static String JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
+    private static final String JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
 
     static {
         try (Connection connection = DriverManager.getConnection(JDBC_URL)) {

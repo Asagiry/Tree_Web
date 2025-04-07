@@ -71,36 +71,6 @@ public class Node {
         children.clear();
     }
 
-    public void removeChildByName(String name) {
-        for (int i = 0;i!= children.size();i++){
-            if (children.get(i).getName().equals(name))
-            {
-                children.remove(i);
-                break;
-            }
-        }
-    }
-
-    public void removeChildById(UUID id) {
-        for (int i = 0;i!= children.size();i++){
-            if (children.get(i).getId().toString().equals(id.toString()))
-            {
-                children.remove(i);
-                break;
-            }
-        }
-    }
-
-    public Node findChildByName(String name) {
-        AtomicReference<Node> founded = new AtomicReference<>();
-        iterateTree((level, node) -> {
-            if (node.getName().equals(name)) {
-                founded.set(node);
-            }
-        });
-        return founded.get();
-    }
-
     public Node findChildById(UUID id) {
         AtomicReference<Node> founded = new AtomicReference<>();
         iterateTree((level, node) -> {
@@ -135,6 +105,7 @@ public class Node {
             toDelete.removeChildren();
         }
     }
+
 
     public void iterateTree(TreeIteratorHandler handler){
         iterateStaticTree(handler,this,0);

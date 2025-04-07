@@ -133,34 +133,6 @@ class NodeTest {
     }
 
     @Test
-    void removeChildByName() {
-        Node root = new Node("Root");
-        Node child = new Node("Child");
-        Node remove = new Node("Remove");
-        root.addChild(child);
-        root.addChild(remove);
-
-        root.removeChildByName("Remove");
-
-        assertEquals(1,root.getChildren().size());
-        assertEquals(child.getName(),root.getChildren().get(0).getName());
-    }
-
-    @Test
-    void removeChildById(){
-        Node root = new Node("Root");
-        Node child = new Node("Child");
-        Node remove = new Node("Remove");
-        root.addChild(child);
-        root.addChild(remove);
-
-        root.removeChildById(remove.getId());
-
-        assertEquals(1,root.getChildren().size());
-        assertEquals(child.getId(),root.getChildren().get(0).getId());
-    }
-
-    @Test
     void findChildById(){
         Node root = new Node("Root");
         Node firstChildren = new Node("FirstChildren");
@@ -196,54 +168,6 @@ class NodeTest {
 
         assertEquals(foundE,e);
         assertEquals(foundF,f);
-    }
-
-    @Test
-    void findChildByName(){
-        Node root = new Node("Root");
-        Node firstChildren = new Node("FirstChildren");
-        Node secondChildren = new Node("SecondChildren");
-        root.addChild(firstChildren);
-        root.addChild(secondChildren);
-
-        Node found = root.findChildByName(firstChildren.getName());
-        assertEquals(firstChildren.getId(),found.getId());
-
-        found = root.findChildByName(secondChildren.getName());
-        assertEquals(secondChildren.getId(),found.getId());
-
-    }
-
-    @Test
-    void findDeepChildByName(){
-        Node root = new Node("Root");
-        Node a = new Node("a");
-        Node b = new Node("b");
-        Node c = new Node("c");
-        Node d = new Node("d");
-        Node e = new Node("e");
-        Node f = new Node("f");
-        root.addChild(a);
-        root.addChild(b);
-        a.addChild(c);
-        a.addChild(d);
-        b.addChild(e);
-        b.addChild(f);
-
-        Node foundE = root.findChildByName(e.getName());
-        Node foundF = root.findChildByName(f.getName());
-
-        assertEquals(foundE,e);
-        assertEquals(foundF,f);
-    }
-
-    @Test
-    void findNonExistChildByName(){
-        Node root = new Node("Root");
-
-        Node notFound = root.findChildByName("Child");
-
-        assertNull(notFound);
     }
 
     @Test

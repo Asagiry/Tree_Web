@@ -1,6 +1,7 @@
 package ru.krista.yargu.epishin.web.tree;
 
 import ru.krista.yargu.epishin.tree.Node;
+import ru.krista.yargu.epishin.tree.NodeStorage;
 import ru.krista.yargu.epishin.web.utils.Constants;
 
 import javax.ws.rs.FormParam;
@@ -19,14 +20,15 @@ import java.util.UUID;
  */
 @Path(Constants.TREE_BASE_PATH)
 public class TreePresentationController {
-    private final Node tree;
+    private final TreeServise treeServise = new TreeServise();
+    private final NodeStorage treeStorage;
 
     /**
      * Запоминает дерево, с которым будет работать.
-     * @param tree список, с которым будет работать контроллер.
+     * @param nodeStorage список, с которым будет работать контроллер.
      */
-    public TreePresentationController(Node tree) {
-        this.tree = tree;
+    public TreePresentationController(NodeStorage nodeStorage) {
+        treeStorage = nodeStorage;
     }
 
     /**
@@ -46,7 +48,7 @@ public class TreePresentationController {
                 .append("  <body>")
                 .append("    <h1>Дерево</h1>")
                 .append("    <ul>");
-        tree.iterateTree((level, node) -> resultBuilder.append("<br>")
+        treeStorage.getTree().iterateTree((level, node) -> resultBuilder.append("<br>")
                 .append(" <a href=\"").append(Constants.TREE_BASE_PATH).append("/edit/")
                 .append(node.getId())
                 .append("\" style=\"color: blue; text-decoration: none;\">")  // Фиксированный стиль
@@ -72,7 +74,8 @@ public class TreePresentationController {
     @Path("add/")
     @Produces("text/html")
     public Response add(){
-        tree.addChild(new Node("ZZZ"));
+        treeStorage.getTree().addChild(new Node("ZZZ"));
+        treeStorage.save();
         try {
             return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
@@ -83,8 +86,9 @@ public class TreePresentationController {
     @Path("add/{parentId}")
     @Produces("text/html")
     public Response add(@PathParam("parentId") UUID parentId) {
-        Node parent = tree.findChildById(parentId);
+        Node parent = treeStorage.getTree().findChildById(parentId);
         parent.addChild(new Node("ZZZ"));
+        treeStorage.save();
         try {
             return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
@@ -101,9 +105,8 @@ public class TreePresentationController {
     @Path("/edit/{id}")
     @Produces("text/html")
     public String getEditPage(@PathParam("id") UUID itemId) {
-        Node treeItem = tree.findChildById(itemId);
+        Node treeItem = treeStorage.getTree().findChildById(itemId);
         StringBuilder result = new StringBuilder();
-
         result.append("<html>")
                 .append("  <head>")
                 .append("    <title>Редактирование элемента дерева</title>")
@@ -118,7 +121,7 @@ public class TreePresentationController {
                 .append("    <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/add/").append(itemId).append("\">")
                 .append("      <input type=\"submit\" value=\"Добавить элемент\"/>")
                 .append("    </form>");
-        if (!itemId.equals(tree.getId())) {
+        if (!itemId.equals(treeStorage.getTree().getId())) {
             result.append("    <form method=\"post\" action=\"").append(Constants.TREE_BASE_PATH).append("/delete/").append(itemId).append("\">")
                     .append("      <input type=\"submit\" value=\"Удалить элемент\"/>")
                     .append("    </form>");
@@ -138,8 +141,9 @@ public class TreePresentationController {
     @Path("/edit/{id}")
     @Produces("text/html")
     public Response editItem(@PathParam("id") UUID itemId, @FormParam("value") String name) {
-        Node edited = tree.findChildById(itemId);
+        Node edited = treeStorage.getTree().findChildById(itemId);
         edited.setName(name);
+        treeStorage.save();
         try {
             return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
@@ -156,7 +160,8 @@ public class TreePresentationController {
     @Path("/delete/{id}")
     @Produces("text/html")
     public Response deleteItem(@PathParam("id") UUID itemId) {
-        tree.deleteChildById(itemId);
+        treeStorage.getTree().deleteChildById(itemId);
+        treeStorage.save();
         try {
             return Response.seeOther(new URI(Constants.TREE_BASE_PATH)).build();
         } catch (URISyntaxException e) {
