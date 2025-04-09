@@ -1,6 +1,7 @@
 package ru.krista.yargu.epishin.web.tree;
 
 import ru.krista.yargu.epishin.exceptions.tree.ClearDBTreeException;
+import ru.krista.yargu.epishin.exceptions.tree.DBException;
 import ru.krista.yargu.epishin.exceptions.tree.EmptyDBTreeException;
 import ru.krista.yargu.epishin.exceptions.tree.InitDBTreeException;
 import ru.krista.yargu.epishin.exceptions.tree.LoadDBTreeException;
@@ -18,15 +19,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class TreeServise {
-    private static final String JDBC_URL = "jdbc:h2:file:./tree_database;AUTO_SERVER=TRUE";
+public class TreeService {
+    //private static final String JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
+    private static final String JDBC_URL = "jdbc:h2:file:./tree_database";
     private Node tree = null;
     private final Map<UUID,Node> nodes = new HashMap<>();
     private final Map<UUID,UUID> parentRelations = new HashMap<>();
 
-    public TreeServise() throws EmptyDBTreeException, InitDBTreeException, LoadDBTreeException {
+    public TreeService() throws DBException {
         createTable();
         loadTree();
+    }
+    public TreeService(Node tree) throws SaveDBTreeException {
+        this.tree = tree;
+        save();
     }
     public void createTable() throws InitDBTreeException {
         try (Connection connection = DriverManager.getConnection(JDBC_URL);
@@ -41,7 +47,7 @@ public class TreeServise {
             statement.execute(sql);
 
         } catch (SQLException e) {
-            throw new InitDBTreeException("Failed to initialize database", e);
+            throw new InitDBTreeException(e);
         }
     }
     private void loadTree() throws EmptyDBTreeException, LoadDBTreeException {
@@ -70,7 +76,7 @@ public class TreeServise {
                 }
             }
         } catch (SQLException e) {
-            throw new LoadDBTreeException("Не удалось загрузить вершины дерева");
+            throw new LoadDBTreeException(e);
         }
     }
     private void createTreeFromNodes() throws EmptyDBTreeException {
@@ -88,7 +94,7 @@ public class TreeServise {
             }
         }
         if (tree == null)
-            throw new EmptyDBTreeException("База данных пуста");
+            throw new EmptyDBTreeException();
     }
 
     private void clearDatabase() throws ClearDBTreeException {
@@ -96,7 +102,7 @@ public class TreeServise {
              Statement statement = connection.createStatement()) {
             statement.execute("DELETE FROM TREE_TABLE");
         } catch (SQLException e) {
-            throw new ClearDBTreeException("Failed to clear tree data", e);
+            throw new ClearDBTreeException(e);
         }
     }
 
@@ -105,20 +111,20 @@ public class TreeServise {
         try {
             clearDatabase();
         } catch (ClearDBTreeException e) {
-            throw new SaveDBTreeException("Не удалось очистить базу перед сохранением");
+            throw new SaveDBTreeException(e);
         }
 
         try (Connection connection = DriverManager.getConnection(JDBC_URL)) {
             String insertSQL = "INSERT INTO TREE_TABLE (id, parent_id, name) VALUES (?, ?, ?)";
-            try (PreparedStatement pstmt = connection.prepareStatement(insertSQL)) {
-                pstmt.setString(1, tree.getId().toString());
-                pstmt.setNull(2, Types.VARCHAR);
-                pstmt.setString(3, tree.getName());
-                pstmt.executeUpdate();
-                saveChildrenRecursive(connection, tree, pstmt);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertSQL)) {
+                preparedStatement.setString(1, tree.getId().toString());
+                preparedStatement.setNull(2, Types.VARCHAR);
+                preparedStatement.setString(3, tree.getName());
+                preparedStatement.executeUpdate();
+                saveChildrenRecursive(connection, tree, preparedStatement);
             }
         } catch (SQLException e) {
-            throw new SaveDBTreeException("Не удалось сохранить базу данных");
+            throw new SaveDBTreeException(e);
         }
     }
 
@@ -136,6 +142,9 @@ public class TreeServise {
 
     public Node getTree(){
         return tree;
+    }
+    public void setTree(Node tree){
+        this.tree = tree;
     }
 
 

@@ -23,7 +23,7 @@ public class WebServer {
      * Запускает web-сервер. По окончании работы требуется ручная остановка процесса.
      */
     private static void start() {
-        Configurator.setLevel("ru.krista.yargu.epishin", Level.INFO);
+        Configurator.setLevel("ru.krista.yargu.epishin", Level.TRACE);
 
         RestApplication restApplication = new RestApplication();
 
