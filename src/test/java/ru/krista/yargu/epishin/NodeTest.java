@@ -271,14 +271,12 @@ class NodeTest {
         b.addChild(e);
 
         String actual = root.getStringTree();
-        String expected = """
-                Root
-                  a
-                    c
-                    d
-                  b
-                    e
-                """;
+        String expected = "Root\n" +
+                "  a\n" +
+                "    c\n" +
+                "    d\n" +
+                "  b\n" +
+                "    e\n";
 
         assertEquals(expected,actual);
     }
@@ -298,13 +296,12 @@ class NodeTest {
         b.addChild(e);
 
         String actual = root.getHtmlTree();
-        String expected = """
-                <HTML>
-                <HEAD>
-                <BODY>
-                Root<br>  a<br>    c<br>    d<br>  b<br>    e<br></BODY>
-                </HEAD>
-                </HTML>""";
+        String expected = "<HTML>\n" +
+                "<HEAD>\n" +
+                "<BODY>\n" +
+                "Root<br>  a<br>    c<br>    d<br>  b<br>    e<br></BODY>\n" +
+                "</HEAD>\n" +
+                "</HTML>";
         assertEquals(expected,actual);
     }
 

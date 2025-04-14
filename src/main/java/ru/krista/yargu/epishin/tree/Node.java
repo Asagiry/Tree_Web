@@ -66,6 +66,7 @@ public class Node {
         if (child.getChildren().contains(this)) {
             logger.error( "Циклическая зависимость: добавляемая нода {}"+
                              " уже является родителем для {}",child.getName(),this.getName());
+            throw new IllegalArgumentException();
         }
 
         if (!children.contains(child)){
