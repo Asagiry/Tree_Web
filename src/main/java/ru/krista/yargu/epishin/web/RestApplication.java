@@ -48,8 +48,8 @@ public class RestApplication extends Application {
 
         try {
             resources.add(new LoginController());
-        } catch (InitDBLoginException _) {
-
+        } catch (InitDBLoginException e) {
+            //handle
         }
         return resources;
     }
