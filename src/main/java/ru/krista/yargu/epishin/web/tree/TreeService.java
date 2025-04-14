@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.UUID;
 
 public class TreeService {
-    //private static final String JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1";
     private static final String JDBC_URL = "jdbc:h2:file:./tree_database";
     private Node tree = null;
     private final Map<UUID,Node> nodes = new HashMap<>();

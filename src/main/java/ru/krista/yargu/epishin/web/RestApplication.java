@@ -1,7 +1,5 @@
 package ru.krista.yargu.epishin.web;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import ru.krista.yargu.epishin.exceptions.login.InitDBLoginException;
 import ru.krista.yargu.epishin.tree.NodeStorage;
 import ru.krista.yargu.epishin.web.list.ListPresentationController;
@@ -18,7 +16,6 @@ import java.util.Set;
  * Web-приложение в котором регистрируются все ресурсы.
  */
 public class RestApplication extends Application {
-    private final Logger logger = LogManager.getLogger();
 
     private final List<String> list = new ArrayList<>();
     private final NodeStorage treeStorage = new NodeStorage();
